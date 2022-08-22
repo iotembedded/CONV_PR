@@ -9,8 +9,10 @@ import random
 import numpy as np
 import time
 
+#경로
 Path = "E:/4-여름/연구과제(반도체Leak검출)/지문 이미지 데이터 과제/labelingData/"
 
+#숫자를 문자열로 list 저장
 num = list(map(str, range(1, 19)))
 human_num = list(map(str, range(1, 460)))
 img = []
@@ -18,37 +20,24 @@ img_t = []
 Path_num = []
 num_v = []
 tf = transforms.ToTensor()
-# def tensorTOimage():
-#     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-#     print('Using {} device'.format(device))
-#
-#     input_image = torch.rand(3,128,128)
-#     print(input_image.size())
-#
-#     tf = transforms.ToPILImage()
-#     img = tf(input_image)
-#     img.show()
-#
-# def imageTOtensor(num):
-#     Path_num = Path + human_num + "_"+num+".bmp"
-#     img = Image.open(Path_num)
-#     tf = transforms.ToTensor()
-#     img_t = tf(img)
-#     print(img_t)
+
 
 def change_num():
     number_random = random.sample(num, 2)  # a라는 리스트에서 2개를 랜덤으로 추출
     return number_random
 
+#입력 숫자에 따른 문자열(경로) 반환
 def Path_f(hn_f, n_f):
     path_all = Path + human_num[hn_f-1] + "_" + num[n_f-1]+".bmp"
     return path_all
 
+#n번 인물에 따른 지문 Trueset을 만들어 주는 함수
 def True_set_make(hn_f1):
     num_v = random.sample(range(1, 19), 2)
     x1 = Path_f(hn_f1, num_v[0])
     x2 = Path_f(hn_f1, num_v[1])
 
+    # 경로에 해당하는 파일이 있을 시 다음으로 진행
     s_data=0
     while True:
         for j in range(1, 19):
@@ -60,12 +49,13 @@ def True_set_make(hn_f1):
         else:
             break
 
-    #만약 해당 경로에 파일이 없을 시(뒤의 숫자로 인해 파일이 검색 안될 때)
+    #만약 해당 경로에 파일이 없을 시(1_x.png  해당 x가 없어 파일이 검색 안될 때)
     while os.path.isfile(x1) == False or os.path.isfile(x2) == False:
         num_v = random.sample(range(1, 19), 2)
         x1 = Path_f(hn_f1, num_v[0])
         x2 = Path_f(hn_f1, num_v[1])
 
+    #이미지 결합
     img1 = Image.open(x1)
     img2 = Image.open(x2)
     img_t1 = tf(img1)
@@ -73,7 +63,9 @@ def True_set_make(hn_f1):
     result = torch.cat([img_t1, img_t2], dim=2)
     return result
 
+#n번 인물에 따른 지문 Falseset을 만들어 주는 함수
 def False_set_make(hn_f2):
+    # Trueset 해당 인물과 다른 인물이면 통과
     while True:
         num_f = random.sample(range(1, 460), 2)
 
@@ -103,8 +95,7 @@ def False_set_make(hn_f2):
     result = torch.cat([img_t1, img_t2], dim=2)
     return result
 
-# imageTOtensor('1', '1')
-#입력받은 숫자를 저장할 리스트를 만들어준다
+# 만들고자하는 숫자 시작과 끝
 def True_set_result(start, end):
     True_set = []
 
@@ -117,6 +108,7 @@ def True_set_result(start, end):
     print("True set 완성")
     print(True_set.shape)
 
+# 만들고자하는 숫자 시작과 끝
 def False_set_result(start, end):
     False_set = []
 
@@ -129,28 +121,7 @@ def False_set_result(start, end):
     print("False set 완성")
     print(False_set.shape)
 
-False_set_result(1, 460)
-#print(a.shape)
-# print(human_num[458])
-# # print(range(0, 459)[458])
-# a = torch.cat([True_set_make(0), True_set_make(1)], dim=0)
-# a = torch.cat([a, True_set_make(2)], dim=0)
-# a = torch.cat([a, True_set_make(3)], dim=0)
-# a = torch.cat([a, True_set_make(4)], dim=0)
-# a = torch.cat([a, True_set_make(5)], dim=0)
-# a = torch.cat([a, True_set_make(6)], dim=0)
-# a = torch.cat([a, True_set_make(7)], dim=0)
-# a = torch.cat([a, True_set_make(8)], dim=0)
-# a = torch.cat([a, True_set_make(9)], dim=0)
-# a = torch.cat([a, True_set_make(10)], dim=0)
-# a = torch.cat([a, True_set_make(11)], dim=0)
-#print(a.shape)
-
-
-#
-# print(True_set.shape)
-
-# Path_num = Path + human_num[1] + "_" + num[1]+".bmp"
-# img = Image.open(Path_num)
-# img_t[1] = tf(img)
-#print(tf[1])
+#1~459까지의 Tensor Trueset 만드는 것
+#True_set_result(1, 460)
+#1~459까지의 Tensor Falseset 만드는 것
+#False_set_result(1, 460)
